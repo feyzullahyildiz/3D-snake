@@ -1,17 +1,30 @@
 import * as THREE from "three";
+import { getOldPosition } from "./get-old-position";
+import { getNextPosition } from "./get-next-position";
 
 const HEIGHT = 1.38;
 const THRESHOLD = 0.15;
 
+enum Direction {
+  X_PLUS = "X_PLUS",
+  X_NEGATIVE = "X_NEGATIVE",
+  Z_PLUS = "Z_PLUS",
+  Z_NEGATIVE = "Z_NEGATIVE",
+}
+type BodyPart = {
+  x: number
+  z: number
+  direction: Direction
+}
 export const createSnake = (
   scene: THREE.Scene,
   x: number,
   y: number,
   boxSize: number,
   updateHeadPosition: (x: number, y: number, z: number) => void,
-  updateDemoPosition: (x: number, z: number) => void,
+  updateDemoPosition: (x: number, z: number) => void
 ) => {
-  let snakeLength = 1;
+  let snakeLength = 4;
   let direction = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
   let nextDirection = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
 
@@ -45,32 +58,32 @@ export const createSnake = (
   const speed = 0.03;
   let isTurning = false;
 
-  const checkTurning = () => {
-    if (!isTurning) return;
-    const resetTurning = () => {
-      isTurning = false;
-      direction.x = nextDirection.x;
-      direction.y = nextDirection.y;
-    };
-    const hx = head.position.x;
-    const hz = head.position.z;
-    if (nextDirection.x === 0) {
-      if (Math.abs(hx % 1) < THRESHOLD) {
-        resetTurning();
-        head.position.x = Math.round(head.position.x);
-      }
-    } else {
-      if (Math.abs(hz % 1) < THRESHOLD) {
-        resetTurning();
-        head.position.z = Math.round(head.position.z);
-      }
-    }
-  };
+  // const checkTurning = () => {
+  //   if (!isTurning) return;
+  //   const resetTurning = () => {
+  //     isTurning = false;
+  //     direction.x = nextDirection.x;
+  //     direction.y = nextDirection.y;
+  //   };
+  //   const hx = head.position.x;
+  //   const hz = head.position.z;
+  //   if (nextDirection.x === 0) {
+  //     if (Math.abs(hx % 1) < THRESHOLD) {
+  //       resetTurning();
+  //       head.position.x = Math.round(head.position.x);
+  //     }
+  //   } else {
+  //     if (Math.abs(hz % 1) < THRESHOLD) {
+  //       resetTurning();
+  //       head.position.z = Math.round(head.position.z);
+  //     }
+  //   }
+  // };
   return {
     updateSnake: (time: number) => {
       // TODO speed parametresi gelsin... Zamana göre hesaplanabilmeli, fps'e göre değil
 
-      checkTurning();
+      // checkTurning();
 
       // Move head
       if (direction.x === 0) {
@@ -87,33 +100,6 @@ export const createSnake = (
       const hz = head.position.z;
 
 
-      const h1X = Math.ceil(hx) - direction.x;
-      const h1Z = Math.ceil(hz) - direction.y;
-      updateDemoPosition(h1X, h1Z);
-
-      for (let i = 0; i < bodyParts.length; i++) {
-        const current = bodyParts[i];
-        const target = i === 0 ? head : bodyParts[i - 1];
-
-        // const currentDir = bodyPartDirections[i];
-        // const target = i === 0 ? head : bodyParts[i - 1];
-        // const targetDir = i === 0 ? direction : bodyPartDirections[i - 1];
-
-        // Check if we need to change direction
-        // if (Math.abs(target.position.x - current.position.x) >= 1 ||
-        //     Math.abs(target.position.z - current.position.z) >= 1) {
-        //   // Update direction to match target's direction
-        //   currentDir.x = targetDir.x;
-        //   currentDir.y = targetDir.y;
-        // }
-
-        // Move in current direction
-        // if (currentDir.x === 0) {
-        //   current.position.z += currentDir.y * speed;
-        // } else {
-        //   current.position.x += currentDir.x * speed;
-        // }
-      }
     },
     updateDirection: (newDir: THREE.Vector2) => {
       if (isTurning) {
