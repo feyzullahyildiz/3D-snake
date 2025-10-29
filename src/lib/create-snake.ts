@@ -1,32 +1,24 @@
 import * as THREE from "three";
 import { getOldPosition } from "./get-old-position";
 import { getNextPosition } from "./get-next-position";
+import { SnakeDirection, type SnakeBodyPart } from "./types";
+import { calculatePositionAndDirection } from "./calculate-position-and-direction";
 
 const HEIGHT = 1.38;
 const THRESHOLD = 0.15;
+// const NEXT_DIRECTION_THRESHOLD = 0.05;
 
-enum Direction {
-  X_PLUS = "X_PLUS",
-  X_NEGATIVE = "X_NEGATIVE",
-  Z_PLUS = "Z_PLUS",
-  Z_NEGATIVE = "Z_NEGATIVE",
-}
-type BodyPart = {
-  x: number
-  z: number
-  direction: Direction
-}
 export const createSnake = (
   scene: THREE.Scene,
   x: number,
   y: number,
   boxSize: number,
-  updateHeadPosition: (x: number, y: number, z: number) => void,
+  notifyHeadPosition: (x: number, y: number, z: number) => void,
   updateDemoPosition: (x: number, z: number) => void
 ) => {
   let snakeLength = 4;
-  let direction = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
-  let nextDirection = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
+  // let direction = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
+  // let nextDirection = new THREE.Vector2(0, -1); // Başlangıç yönü sağa
 
   const headGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
   const headMaterial = new THREE.MeshPhongMaterial({
@@ -35,87 +27,162 @@ export const createSnake = (
     // shininess: 20,
   });
 
-  const head = new THREE.Mesh(headGeometry, headMaterial);
-  head.position.set(x, HEIGHT, y);
-  scene.add(head);
+  const headMesh = new THREE.Mesh(headGeometry, headMaterial);
+  headMesh.position.set(x, HEIGHT, y);
+  scene.add(headMesh);
 
-  const bodyParts: THREE.Mesh[] = [];
+  const bodyParts: SnakeBodyPart[] = [];
   // const bodyPartDirections: THREE.Vector2[] = [];
   const bodyPart = new THREE.MeshPhongMaterial({
     color: 0x00ff00,
   });
 
+  const head: SnakeBodyPart = {
+    mesh: headMesh,
+    direction: SnakeDirection.Z_NEGATIVE,
+  };
   // Create body parts with proper spacing
   for (let i = 1; i <= snakeLength; i++) {
     const bodyGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-    const item = new THREE.Mesh(bodyGeometry, bodyPart);
-    item.position.set(x + direction.x * i, HEIGHT, y - direction.y * i);
-    scene.add(item);
-    bodyParts.push(item);
-    // bodyPartDirections.push(new THREE.Vector2(direction.x, direction.y));
+    const mesh = new THREE.Mesh(bodyGeometry, bodyPart);
+    mesh.position.set(x, HEIGHT, y + i);
+    scene.add(mesh);
+    bodyParts.push({ mesh, direction: SnakeDirection.Z_NEGATIVE });
   }
 
-  const speed = 0.03;
+  // const speed = 0.03;
   let isTurning = false;
 
-  // const checkTurning = () => {
-  //   if (!isTurning) return;
-  //   const resetTurning = () => {
-  //     isTurning = false;
-  //     direction.x = nextDirection.x;
-  //     direction.y = nextDirection.y;
-  //   };
-  //   const hx = head.position.x;
-  //   const hz = head.position.z;
-  //   if (nextDirection.x === 0) {
-  //     if (Math.abs(hx % 1) < THRESHOLD) {
-  //       resetTurning();
-  //       head.position.x = Math.round(head.position.x);
-  //     }
-  //   } else {
-  //     if (Math.abs(hz % 1) < THRESHOLD) {
-  //       resetTurning();
-  //       head.position.z = Math.round(head.position.z);
-  //     }
-  //   }
-  // };
-  return {
-    updateSnake: (time: number) => {
-      // TODO speed parametresi gelsin... Zamana göre hesaplanabilmeli, fps'e göre değil
+  let keyPressHitPositon = head.mesh.position.clone();
+  let nextDirection: SnakeDirection = head.direction;
+  const checkTurning = () => {
+    if (!isTurning) return;
+    const resetTurning = () => {
+      console.log("resetTurning");
+      isTurning = false;
+      head.direction = nextDirection;
+    };
+    const hx = head.mesh.position.x;
+    const hz = head.mesh.position.z;
 
-      // checkTurning();
+    if (head.direction === SnakeDirection.X_PLUS) {
+      head.mesh.position.z;
+    }
+    if (
+      head.direction === SnakeDirection.X_PLUS ||
+      head.direction === SnakeDirection.X_NEGATIVE
+    ) {
+      if (Math.abs(hx % 1) < THRESHOLD) {
+        resetTurning();
+        head.mesh.position.x = Math.round(head.mesh.position.x);
+      }
+    } else {
+      if (Math.abs(hz % 1) < THRESHOLD) {
+        resetTurning();
+        head.mesh.position.z = Math.round(head.mesh.position.z);
+      }
+    }
+  };
+  return {
+    updateSnake: (time: number, speed: number) => {
+      checkTurning();
 
       // Move head
-      if (direction.x === 0) {
-        head.position.z += direction.y * speed;
-      } else {
-        head.position.x += direction.x * speed;
-      }
+      // if (direction.x === 0) {
+      //   head.position.z += direction.y * speed;
+      // } else {
+      //   head.position.x += direction.x * speed;
+      // }
 
       // Update head position for collision detection
-      updateHeadPosition(head.position.x, head.position.y, head.position.z);
 
-      // Update body parts
-      const hx = head.position.x;
-      const hz = head.position.z;
+      // udpatePositionWithDirection(head.mesh.position, head.direction, speed);
 
+      // for (let i = 0; i < bodyParts.length; i++) {
+      //   const current = bodyParts[i];
+      //   const target = i === 0 ? head : bodyParts[i - 1];
+
+      //   calculatePositionAndDirection(target, current);
+      //   udpatePositionWithDirection(
+      //     current.mesh.position,
+      //     current.direction,
+      //     speed
+      //   );
+      // }
+
+      /****************** */
+
+      for (let i = bodyParts.length - 1; i > -1; i--) {
+        const current = bodyParts[i];
+        const target = i === 0 ? head : bodyParts[i - 1];
+
+        calculatePositionAndDirection(target, current);
+        udpatePositionWithDirection(
+          current.mesh.position,
+          current.direction,
+          speed
+        );
+      }
+      udpatePositionWithDirection(head.mesh.position, head.direction, speed);
+
+      notifyHeadPosition(
+        headMesh.position.x,
+        headMesh.position.y,
+        headMesh.position.z
+      );
 
     },
     updateDirection: (newDir: THREE.Vector2) => {
       if (isTurning) {
+        console.log("isTurning CANCELLED");
         return;
       }
-      if (
-        Math.abs(direction.x) === Math.abs(newDir.x) &&
-        Math.abs(direction.y) === Math.abs(newDir.y)
-      ) {
-        // Aynı yönde gitmeye çalışıyor, yoksay
-        return;
+      console.log("isTurning STARTED");
+      // if (
+      //   Math.abs(direction.x) === Math.abs(newDir.x) &&
+      //   Math.abs(direction.y) === Math.abs(newDir.y)
+      // ) {
+      //   // Aynı yönde gitmeye çalışıyor, yoksay
+      //   return;
+      // }
+      if (newDir.x === 1) {
+        nextDirection = SnakeDirection.X_PLUS;
+      } else if (newDir.x === -1) {
+        nextDirection = SnakeDirection.X_NEGATIVE;
+      } else if (newDir.y === 1) {
+        nextDirection = SnakeDirection.Z_PLUS;
+      } else if (newDir.y === -1) {
+        nextDirection = SnakeDirection.Z_NEGATIVE;
+      } else {
+        throw new Error("Invalid direction");
       }
-      nextDirection.x = newDir.x;
-      nextDirection.y = newDir.y;
-
+      keyPressHitPositon.set(
+        head.mesh.position.x,
+        head.mesh.position.y,
+        head.mesh.position.z
+      );
       isTurning = true;
     },
   };
 };
+
+function udpatePositionWithDirection(
+  position: THREE.Vector3,
+  direction: SnakeDirection,
+  speed: number
+) {
+  switch (direction) {
+    case SnakeDirection.X_PLUS:
+      position.x += speed;
+      break;
+    case SnakeDirection.X_NEGATIVE:
+      position.x -= speed;
+      break;
+    case SnakeDirection.Z_PLUS:
+      position.z += speed;
+      break;
+    case SnakeDirection.Z_NEGATIVE:
+      position.z -= speed;
+      break;
+  }
+}

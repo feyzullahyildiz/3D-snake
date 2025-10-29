@@ -4,7 +4,7 @@ export const createUI = (scene: THREE.Scene) => {
     const parent = document.createElement("div");
     parent.style.position = "absolute";
     parent.style.top = "10px";
-    parent.style.left = "10px";
+    parent.style.right = "10px";
     parent.style.color = "white";
     parent.style.zIndex = "1";
     parent.style.whiteSpace = "pre";

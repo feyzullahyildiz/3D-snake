@@ -41,18 +41,23 @@ const { updateSnake, updateDirection } = createSnake(
   scene,
   0,
   0,
-  BOX_SIZE,
+  BOX_SIZE / 1.8,
   updateHeadPosition,
-  updateFoodPosition,
+  updateFoodPosition
 );
 createOrbits(camera, renderer.domElement);
 createListenKeyboardForDirections(updateDirection);
 
+
+let lastTick = Date.now();
 function animate() {
-  const now = Date.now();
-  updateFood(now);
-  updateSnake(now);
+  const delta = Date.now() - lastTick;
+  const speed = delta * 0.003;
+  // console.log(speed);
+  updateFood(lastTick);
+  updateSnake(lastTick, speed);
   renderer.render(scene, camera);
+  lastTick = Date.now();
 }
 
 renderer.setAnimationLoop(animate);
