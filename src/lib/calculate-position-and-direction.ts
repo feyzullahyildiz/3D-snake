@@ -5,15 +5,12 @@ const NEXT_DIRECTION_THRESHOLD = 0;
 
 export function calculatePositionAndDirection(
   target: SnakeBodyPart,
-  current: SnakeBodyPart
+  current: SnakeBodyPart,
+  debug = false
 ) {
   const tarDir = target.direction;
   const curDir = current.direction;
 
-  // İkisidi de aynı yöne gidiyorsa devam ettir.
-  if (curDir === tarDir) {
-    return curDir;
-  }
   const tp = target.mesh.position;
   const cp = current.mesh.position;
 
@@ -26,13 +23,35 @@ export function calculatePositionAndDirection(
   const isCurrentOnZ =
     curDir === SnakeDirection.Z_PLUS || curDir === SnakeDirection.Z_NEGATIVE;
 
+  // İkisidi de aynı yöne gidiyorsa devam ettir.
+  if (curDir === tarDir) {
+    //
+    if (curDir === SnakeDirection.X_PLUS) {
+      cp.x = tp.x - 1;
+      cp.z = tp.z;
+    } else if (curDir === SnakeDirection.X_NEGATIVE) {
+      cp.x = tp.x + 1;
+      cp.z = tp.z;
+    } else if (curDir === SnakeDirection.Z_PLUS) {
+      cp.x = tp.x;
+      cp.z = tp.z - 1;
+    } else if (curDir === SnakeDirection.Z_NEGATIVE) {
+      cp.x = tp.x;
+      cp.z = tp.z + 1;
+    }
+    return curDir;
+  }
+
   if (isTargetOnX) {
     const diff = cp.z - tp.z;
+    if (debug) {
+      console.log("X", diff);
+    }
     if (isCurrentOnX && curDir !== tarDir) {
       console.log("IKISI DE X DE");
     }
 
-    if (curDir === SnakeDirection.Z_PLUS && diff >= NEXT_DIRECTION_THRESHOLD) {
+    if (curDir === SnakeDirection.Z_PLUS && diff >= -NEXT_DIRECTION_THRESHOLD) {
       return update(target, current);
     } else if (
       curDir === SnakeDirection.Z_NEGATIVE &&
@@ -45,8 +64,10 @@ export function calculatePositionAndDirection(
       console.log("IKISI DE Z DE");
     }
     const diff = cp.x - tp.x;
-
-    if (curDir === SnakeDirection.X_PLUS && diff >= NEXT_DIRECTION_THRESHOLD) {
+    if (debug) {
+      console.log("Z", diff);
+    }
+    if (curDir === SnakeDirection.X_PLUS && diff >= -NEXT_DIRECTION_THRESHOLD) {
       return update(target, current);
     } else if (
       curDir === SnakeDirection.X_NEGATIVE &&
@@ -63,23 +84,21 @@ export function calculatePositionAndDirection(
 
 function update(target: SnakeBodyPart, current: SnakeBodyPart) {
   console.log("update");
-  setTimeout(() => {
-    const dir = target.direction;
-    current.direction = dir;
-    const cp = current.mesh.position;
-    const tp = target.mesh.position;
-    if (dir === SnakeDirection.X_PLUS) {
-      cp.z = tp.z;
-      cp.x = tp.x - 1;
-    } else if (dir === SnakeDirection.X_NEGATIVE) {
-      cp.z = tp.z;
-      cp.x = tp.x + 1;
-    } else if (dir === SnakeDirection.Z_PLUS) {
-      cp.x = tp.x;
-      cp.z = tp.z - 1;
-    } else if (dir === SnakeDirection.Z_NEGATIVE) {
-      cp.x = tp.x;
-      cp.z = tp.z + 1;
-    }
-  });
+  const dir = target.direction;
+  current.direction = dir;
+  const cp = current.mesh.position;
+  const tp = target.mesh.position;
+  if (dir === SnakeDirection.X_PLUS) {
+    cp.z = tp.z;
+    cp.x = tp.x - 1;
+  } else if (dir === SnakeDirection.X_NEGATIVE) {
+    cp.z = tp.z;
+    cp.x = tp.x + 1;
+  } else if (dir === SnakeDirection.Z_PLUS) {
+    cp.x = tp.x;
+    cp.z = tp.z - 1;
+  } else if (dir === SnakeDirection.Z_NEGATIVE) {
+    cp.x = tp.x;
+    cp.z = tp.z + 1;
+  }
 }
