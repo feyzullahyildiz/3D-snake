@@ -33,7 +33,7 @@ camera.lookAt(0, 0, 0);
 const helper = new THREE.GridHelper(13, 13);
 scene.add(helper);
 
-const { updateHeadPosition } = createUI(scene);
+const { updateHeadPosition, updateHeadStack } = createUI(scene);
 createGround(scene, 5, BOX_SIZE);
 createLights(scene);
 const { updateFood, updateFoodPosition } = createFood(scene, 2, 2);
@@ -43,7 +43,8 @@ const { updateSnake, updateDirection } = createSnake(
   0,
   BOX_SIZE / 1.8,
   updateHeadPosition,
-  updateFoodPosition
+  updateFoodPosition,
+  updateHeadStack
 );
 createOrbits(camera, renderer.domElement);
 createListenKeyboardForDirections(updateDirection);
@@ -52,7 +53,7 @@ createListenKeyboardForDirections(updateDirection);
 let lastTick = Date.now();
 function animate() {
   const delta = Date.now() - lastTick;
-  const speed = delta * 0.003;
+  const speed = delta * 0.004;
   // console.log(speed);
   updateFood(lastTick);
   updateSnake(lastTick, speed);

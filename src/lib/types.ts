@@ -1,5 +1,9 @@
-import {Mesh} from "three";
-
+import { Mesh } from "three";
+export type SnakeFIFOItem = {
+  x: number;
+  z: number;
+  nextDirection: SnakeDirection;
+};
 export enum SnakeDirection {
   X_PLUS = "X_PLUS",
   X_NEGATIVE = "X_NEGATIVE",
@@ -11,4 +15,5 @@ export type SnakeBodyPart = {
   // z: number
   mesh: Mesh;
   direction: SnakeDirection;
+  nextDirectionFIFOStack: Array<SnakeFIFOItem>;
 };
