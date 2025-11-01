@@ -6,6 +6,7 @@ import {
 } from "./types";
 import { getNextDirectionFIFOStackPosition } from "./get-next-direction-fifo-stack-position";
 import { getIsPositionPassed } from "./get-is-position-passed";
+import { getNextDirectionFIFOStackByOldOne } from "./get-next-direction-fifo-stack-by-old-one";
 
 const HEIGHT = 1.38;
 // const NEXT_DIRECTION_THRESHOLD = 0.05;
@@ -102,15 +103,9 @@ export const createSnake = (
             updateHeadStack(
               bodyParts[bodyParts.length - 1].nextDirectionFIFOStack
             );
-          } else {
-            // şuanki direction ile devam et.
           }
         }
-        updatePositionWithDirection(
-          part.mesh.position,
-          part.direction,
-          speed
-        );
+        updatePositionWithDirection(part.mesh.position, part.direction, speed);
         if (i !== 0) {
           keepDistanceOnOne(bodyParts[i - 1], part);
         }
@@ -141,17 +136,36 @@ export const createSnake = (
         head.mesh.position.z,
         head.direction
       );
-      // console.log("nextStackPos", nextStackPos.x, nextStackPos.z);
-      bodyParts.forEach((bp) => {
-        bp.nextDirectionFIFOStack.unshift({
+      console.log("nextStackPos", nextStackPos.x, nextStackPos.z);
+      const nextStackState = getNextDirectionFIFOStackByOldOne(
+        head.nextDirectionFIFOStack[0],
+        // TODO buradaya gelen değer head konumu ile geliyor.
+        // konum farklı ise head'in konumu tamamen ignorelanmalı sanki.
+        // Sadece direction'a bakmalıyız diye düşündüm...
+        {
           nextDirection,
           x: nextStackPos.x,
           z: nextStackPos.z,
-        });
+        }
+      );
+      bodyParts.forEach((bp) => {
+        if (nextStackState.replace) {
+          bp.nextDirectionFIFOStack[0] = {
+            nextDirection: nextStackState.stack.nextDirection,
+            x: nextStackState.stack.x,
+            z: nextStackState.stack.z,
+          };
+        } else {
+          bp.nextDirectionFIFOStack.unshift({
+            nextDirection: nextStackState.stack.nextDirection,
+            x: nextStackState.stack.x,
+            z: nextStackState.stack.z,
+          });
+        }
       });
       updateHeadStack(bodyParts[bodyParts.length - 1].nextDirectionFIFOStack);
 
-      updateDemoPosition(nextStackPos.x, nextStackPos.z);
+      updateDemoPosition(nextStackState.stack.x, nextStackState.stack.z);
     },
   };
 };

@@ -13,11 +13,13 @@ export const getNextDirectionFIFOStackPosition = (
   if (isOnX) {
     return {
       x: getNextValue(current, x),
-      z,
+      // TODO I just added the Math.round function here. It looks fixed but not sure :D
+      z: Math.round(z),
     };
   }
   return {
-    x,
+    // TODO I just added the Math.round function here. It looks fixed but not sure :D
+    x: Math.round(x),
     z: getNextValue(current, z),
   };
 };
@@ -26,7 +28,7 @@ function getNextValue(dir: SnakeDirection, value: number) {
   const isPositive = getIsDirectionPositive(dir);
   const trunked = Math.trunc(value);
   if (trunked === value) {
-    return value;
+    return trunked;
   } else if (value < 0 && isPositive) {
     return trunked;
   } else if (0 < value && !isPositive) {
