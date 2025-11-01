@@ -1,6 +1,6 @@
 import { expect, test, describe } from "vitest";
-import { getNextDirectionFIFOStackByOldOne as fn } from "../src/lib/get-next-direction-fifo-stack-by-old-one";
-import { SnakeDirection as SD } from "../src/lib/types";
+import { getNextDirectionFIFOStackByOldOne as fn } from "../src/helper/get-next-direction-fifo-stack-by-old-one";
+import { SnakeDirection as SD } from "../src/helper/types";
 
 describe("getNextDirectionFIFOStackByOldOne", () => {
   test("X_PLUS it should replace with same direction", () => {

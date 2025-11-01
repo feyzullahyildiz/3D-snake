@@ -1,6 +1,6 @@
 import { expect, test, describe } from "vitest";
-import { getIsPositionPassed as fn } from "../src/lib/get-is-position-passed";
-import { SnakeDirection as SD } from "../src/lib/types";
+import { getIsPositionPassed as fn } from "../src/helper/get-is-position-passed";
+import { SnakeDirection as SD } from "../src/helper/types";
 
 describe("getIsPositionPassed", () => {
   test("X_PLUS same values", () => {

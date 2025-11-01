@@ -1,6 +1,6 @@
 import { expect, test, describe } from "vitest";
-import { getNextDirectionFIFOStackPosition as fn } from "../src/lib/get-next-direction-fifo-stack-position";
-import { SnakeDirection as SD } from "../src/lib/types";
+import { getNextDirectionFIFOStackPosition as fn } from "../src/helper/get-next-direction-fifo-stack-position";
+import { SnakeDirection as SD } from "../src/helper/types";
 
 describe("getNextDirectionFIFOStackPosition", () => {
   test("X_PLUS for positive values", () => {

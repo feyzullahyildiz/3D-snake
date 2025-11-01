@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { SnakeFIFOItem } from "./types";
+import type { SnakeFIFOItem } from "../helper/types";
 
 export const createUI = (_scene: THREE.Scene) => {
   const parent = document.createElement("div");

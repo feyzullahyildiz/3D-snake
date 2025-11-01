@@ -3,10 +3,10 @@ import {
   SnakeDirection,
   type SnakeBodyPart,
   type SnakeFIFOItem,
-} from "./types";
-import { getNextDirectionFIFOStackPosition } from "./get-next-direction-fifo-stack-position";
-import { getIsPositionPassed } from "./get-is-position-passed";
-import { getNextDirectionFIFOStackByOldOne } from "./get-next-direction-fifo-stack-by-old-one";
+} from "../helper/types";
+import { getNextDirectionFIFOStackPosition } from "../helper/get-next-direction-fifo-stack-position";
+import { getIsPositionPassed } from "../helper/get-is-position-passed";
+import { getNextDirectionFIFOStackByOldOne } from "../helper/get-next-direction-fifo-stack-by-old-one";
 
 const HEIGHT = 1.38;
 // const NEXT_DIRECTION_THRESHOLD = 0.05;
