@@ -7,9 +7,9 @@ import {
 import { getNextDirectionFIFOStackPosition } from "../helper/get-next-direction-fifo-stack-position";
 import { getIsPositionPassed } from "../helper/get-is-position-passed";
 import { getNextDirectionFIFOStackByOldOne } from "../helper/get-next-direction-fifo-stack-by-old-one";
+import { getNextDirectionByRightLeft } from "../helper/get-next-direction-by-right-left";
 
 const HEIGHT = 1.38;
-// const NEXT_DIRECTION_THRESHOLD = 0.05;
 
 export const createSnake = (
   scene: THREE.Scene,
@@ -42,11 +42,12 @@ export const createSnake = (
       bodyGeometry,
       i === 0 ? headMaterial : bodyPartMaterial
     );
-    mesh.position.set(x, HEIGHT, y + i);
+    // This position is getting fixed before the render
+    mesh.position.set(x, HEIGHT, y);
     scene.add(mesh);
     bodyParts.push({
       mesh,
-      direction: SnakeDirection.Z_NEGATIVE,
+      direction: SnakeDirection.X_PLUS,
       nextDirectionFIFOStack: [
         // {
         //   x: 2,
@@ -116,27 +117,16 @@ export const createSnake = (
         head.mesh.position.y,
         head.mesh.position.z
       );
+      return head;
     },
-    updateDirection: (newDir: THREE.Vector2) => {
-      let nextDirection: SnakeDirection = head.direction;
+    updateDirection: (rigthtLeft: "right" | "left") => {
+      const nextDirection = getNextDirectionByRightLeft(head.direction, rigthtLeft);
 
-      if (newDir.x === 1) {
-        nextDirection = SnakeDirection.X_PLUS;
-      } else if (newDir.x === -1) {
-        nextDirection = SnakeDirection.X_NEGATIVE;
-      } else if (newDir.y === 1) {
-        nextDirection = SnakeDirection.Z_PLUS;
-      } else if (newDir.y === -1) {
-        nextDirection = SnakeDirection.Z_NEGATIVE;
-      } else {
-        throw new Error("Invalid direction");
-      }
       const nextStackPos = getNextDirectionFIFOStackPosition(
         head.mesh.position.x,
         head.mesh.position.z,
         head.direction
       );
-      console.log("nextStackPos", nextStackPos.x, nextStackPos.z);
       const nextStackState = getNextDirectionFIFOStackByOldOne(
         head.nextDirectionFIFOStack[0],
         // TODO buradaya gelen değer head konumu ile geliyor.
