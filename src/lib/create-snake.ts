@@ -4,7 +4,6 @@ import {
   type SnakeBodyPart,
   type SnakeFIFOItem,
 } from "./types";
-import { calculatePositionAndDirection } from "./calculate-position-and-direction";
 import { getNextDirectionFIFOStackPosition } from "./get-next-direction-fifo-stack-position";
 import { getIsPositionPassed } from "./get-is-position-passed";
 
@@ -77,11 +76,7 @@ export const createSnake = (
 
   // let keyPressHitPositon = head.mesh.position.clone();
   return {
-    updateSnake: (time: number, speed: number) => {
-      // checkTurning();
-
-      // updatePositionWithDirection(head.mesh.position, head.direction, speed);
-
+    updateSnake: (_time: number, speed: number) => {
       for (let i = 0; i < bodyParts.length; i++) {
         const part = bodyParts[i];
         const next =
@@ -100,8 +95,8 @@ export const createSnake = (
             // direction update et
             part.direction = next.nextDirection;
             // x ve z değerini stack position'ı ile güncelle.
-            part.mesh.position.x = next.x;
-            part.mesh.position.z = next.z;
+            // part.mesh.position.x = next.x;
+            // part.mesh.position.z = next.z;
             // stack'deki son elemanı arrayden çıkart.
             part.nextDirectionFIFOStack.pop();
             updateHeadStack(
@@ -111,7 +106,14 @@ export const createSnake = (
             // şuanki direction ile devam et.
           }
         }
-        updatePositionWithDirection(part.mesh.position, part.direction, speed);
+        updatePositionWithDirection(
+          part.mesh.position,
+          part.direction,
+          speed
+        );
+        if (i !== 0) {
+          keepDistanceOnOne(bodyParts[i - 1], part);
+        }
       }
 
       notifyHeadPosition(
@@ -121,7 +123,7 @@ export const createSnake = (
       );
     },
     updateDirection: (newDir: THREE.Vector2) => {
-  let nextDirection: SnakeDirection = head.direction;
+      let nextDirection: SnakeDirection = head.direction;
 
       if (newDir.x === 1) {
         nextDirection = SnakeDirection.X_PLUS;
@@ -172,5 +174,29 @@ function updatePositionWithDirection(
     case SnakeDirection.Z_NEGATIVE:
       position.z -= speed;
       break;
+  }
+}
+
+function keepDistanceOnOne(target: SnakeBodyPart, current: SnakeBodyPart) {
+  const tarDir = target.direction;
+  const curDir = current.direction;
+  if (curDir !== tarDir) {
+    return;
+  }
+  const tp = target.mesh.position;
+  const cp = current.mesh.position;
+  //
+  if (curDir === SnakeDirection.X_PLUS) {
+    cp.x = tp.x - 1;
+    cp.z = tp.z;
+  } else if (curDir === SnakeDirection.X_NEGATIVE) {
+    cp.x = tp.x + 1;
+    cp.z = tp.z;
+  } else if (curDir === SnakeDirection.Z_PLUS) {
+    cp.x = tp.x;
+    cp.z = tp.z - 1;
+  } else if (curDir === SnakeDirection.Z_NEGATIVE) {
+    cp.x = tp.x;
+    cp.z = tp.z + 1;
   }
 }

@@ -11,8 +11,6 @@ export enum SnakeDirection {
   Z_NEGATIVE = "Z_NEGATIVE",
 }
 export type SnakeBodyPart = {
-  // x: number
-  // z: number
   mesh: Mesh;
   direction: SnakeDirection;
   nextDirectionFIFOStack: Array<SnakeFIFOItem>;

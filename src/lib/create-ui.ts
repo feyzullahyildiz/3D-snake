@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { SnakeFIFOItem } from "./types";
 
-export const createUI = (scene: THREE.Scene) => {
+export const createUI = (_scene: THREE.Scene) => {
   const parent = document.createElement("div");
   parent.style.position = "absolute";
   parent.style.top = "10px";
