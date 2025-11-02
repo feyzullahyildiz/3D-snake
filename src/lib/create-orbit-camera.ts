@@ -6,7 +6,7 @@ export const createOrbitCamera = (
   scene: THREE.Scene,
   renderer: THREE.WebGLRenderer
 ) => {
-  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 5000);
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 20);
 
   camera.position.x = 0;
   camera.position.y = 14;

@@ -22,10 +22,11 @@ renderer.setScissorTest(true);
 
 document.getElementById("app")!.appendChild(renderer.domElement);
 
-const helper = new THREE.GridHelper(13, 13);
+const GROUND_SIZE = 9;
+const helper = new THREE.GridHelper(GROUND_SIZE + 1, GROUND_SIZE + 1);
 scene.add(helper);
 
-createGround(scene, 5, BOX_SIZE);
+const {updateGround } = createGround(scene, GROUND_SIZE, BOX_SIZE);
 createLights(scene);
 const { updateHeadPosition, updateHeadStack } = createUI(scene);
 const { updateFood, updateFoodPosition } = createFood(scene, 2, 2);
@@ -35,7 +36,6 @@ const { updateSnake, updateDirection } = createSnake(
   0,
   BOX_SIZE / 1,
   updateHeadPosition,
-  updateFoodPosition,
   updateHeadStack
 );
 createListenKeyboardForDirections(updateDirection);
@@ -43,17 +43,18 @@ createListenKeyboardForDirections(updateDirection);
 const { updateSnakeCamera } = createSnakeCamera(scene, renderer);
 const { updateOrbitCamera } = createOrbitCamera(scene, renderer);
 
-
 let lastTick = Date.now();
 function animate() {
   const delta = Date.now() - lastTick;
   const speed = delta * 0.004;
-  // console.log(speed);
+  // console.log(speed)
+
   updateFood(lastTick);
   const head = updateSnake(lastTick, speed);
 
   updateSnakeCamera(lastTick, speed, head);
   updateOrbitCamera(lastTick, speed, head);
+  updateGround(lastTick, speed, head);
 
   lastTick = Date.now();
 }

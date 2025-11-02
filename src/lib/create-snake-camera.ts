@@ -24,7 +24,7 @@ export const createSnakeCamera = (
 
   return {
     updateSnakeCamera: (_time: number, _speed: number, head: SnakeBodyPart) => {
-      cam.position.y = 7;
+      cam.position.y = 5;
       const { x, z } = head.mesh.position;
       setCamTargetPosition(targetPosition, x, z, head.direction);
 

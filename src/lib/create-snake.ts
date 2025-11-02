@@ -17,7 +17,7 @@ export const createSnake = (
   y: number,
   boxSize: number,
   notifyHeadPosition: (x: number, y: number, z: number) => void,
-  updateDemoPosition: (x: number, z: number) => void,
+  // updateDemoPosition: (x: number, z: number) => void,
   updateHeadStack: (stack: Array<SnakeFIFOItem>) => void
 ) => {
   let snakeLength = 5;
@@ -155,7 +155,6 @@ export const createSnake = (
       });
       updateHeadStack(bodyParts[bodyParts.length - 1].nextDirectionFIFOStack);
 
-      updateDemoPosition(nextStackState.stack.x, nextStackState.stack.z);
     },
   };
 };
