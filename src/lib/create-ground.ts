@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import type { SnakeBodyPart } from "../helper/types";
+import {
+  create9TileGroups,
+  update9TileGroupPosition,
+} from "../helper/create-9-tile-logic";
 
 /**
  * createGround: lacivert -> mor arası parlak metalik kutular döndüren fonksiyon
@@ -10,89 +14,27 @@ export const createGround = (scene: THREE.Scene, size = 5, boxSize = 0.85) => {
   if (size % 2 === 0) {
     throw new Error("ground size number should be odd");
   }
-  const texture = new THREE.TextureLoader().load("cube_texture.bmp");
+  const texture = new THREE.TextureLoader().load("cube_texture.png");
   texture.colorSpace = THREE.SRGBColorSpace;
 
-  const halfSize = size / 2;
-  const tileWidth = size;
-  const centerPos = new THREE.Vector2(0, 0); // x for x, y for z
-  const allGroups: THREE.Group[] = [];
-
-  let i = 0;
-  for (let dx = -1; dx <= 1; dx++) {
-    for (let dz = -1; dz <= 1; dz++) {
-      const group = new THREE.Group();
-      const tiles = getTileArray(size, boxSize, i, texture);
-      group.add(...tiles);
-      group.position.set(dx * tileWidth, 0, dz * tileWidth);
-      scene.add(group);
-      allGroups.push(group);
-      i++;
-    }
-  }
+  const { groups, center } = create9TileGroups(size, (i) =>
+    getTileArray(size, boxSize, i, texture)
+  );
+  scene.add(...groups);
 
   return {
     updateGround: (_time: number, _speed: number, head: SnakeBodyPart) => {
-      const pos = head.mesh.position;
-      let xDiff = pos.x - centerPos.x;
-      let zDiff = pos.z - centerPos.y;
-
-      // Sağ geçiş (right)
-      if (xDiff > halfSize) {
-        const leftX = centerPos.x - tileWidth;
-        const newRightX = centerPos.x + 2 * tileWidth;
-        allGroups.forEach((group) => {
-          if (group.position.x === leftX) {
-            group.position.x = newRightX;
-          }
-        });
-        centerPos.x += tileWidth;
-      }
-
-      // Sol geçiş (left)
-      if (xDiff < -halfSize) {
-        const rightX = centerPos.x + tileWidth;
-        const newLeftX = centerPos.x - 2 * tileWidth;
-        allGroups.forEach((group) => {
-          if (group.position.x === rightX) {
-            group.position.x = newLeftX;
-          }
-        });
-        centerPos.x -= tileWidth;
-      }
-
-      // Yukarı geçiş (up, positive z)
-      if (zDiff > halfSize) {
-        const bottomZ = centerPos.y - tileWidth;
-        const newTopZ = centerPos.y + 2 * tileWidth;
-        allGroups.forEach((group) => {
-          if (group.position.z === bottomZ) {
-            group.position.z = newTopZ;
-          }
-        });
-        centerPos.y += tileWidth;
-      }
-
-      // Aşağı geçiş (down, negative z)
-      if (zDiff < -halfSize) {
-        const topZ = centerPos.y + tileWidth;
-        const newBottomZ = centerPos.y - 2 * tileWidth;
-        allGroups.forEach((group) => {
-          if (group.position.z === topZ) {
-            group.position.z = newBottomZ;
-          }
-        });
-        centerPos.y -= tileWidth;
-      }
-
-      // Diff'leri güncelle (eğer birden fazla yönde tetiklendiyse)
-      xDiff = pos.x - centerPos.x;
-      zDiff = pos.z - centerPos.y;
+      update9TileGroupPosition(size, center, groups, head.mesh.position);
     },
   };
 };
 
-function getTileArray(size: number, boxSize: number, colorIndex: number, texture: THREE.Texture) {
+function getTileArray(
+  size: number,
+  boxSize: number,
+  colorIndex: number,
+  texture: THREE.Texture
+) {
   const start = -Math.trunc(size / 2);
   const end = Math.abs(start);
   const arr = [];
@@ -106,7 +48,7 @@ function getTileArray(size: number, boxSize: number, colorIndex: number, texture
       const material = new THREE.MeshPhongMaterial({
         color: color,
         shininess: 100,
-        map: texture
+        map: texture,
       });
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(i, 0.5, j);

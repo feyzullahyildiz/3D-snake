@@ -20,28 +20,39 @@ export const createSnake = (
   // updateDemoPosition: (x: number, z: number) => void,
   updateHeadStack: (stack: Array<SnakeFIFOItem>) => void
 ) => {
+  const texture = new THREE.TextureLoader().load("cube_texture.png");
+  texture.colorSpace = THREE.SRGBColorSpace;
+  // texture.colorSpace = THREE.LinearSRGBColorSpace;
+
   let snakeLength = 5;
 
   // const headGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
   const headMaterial = new THREE.MeshPhongMaterial({
     color: 0xffff00,
     emissive: 0xee1100,
-    // shininess: 20,
+    map: texture,
   });
 
   const bodyParts: SnakeBodyPart[] = [];
   // const bodyPartDirections: THREE.Vector2[] = [];
   const bodyPartMaterial = new THREE.MeshPhongMaterial({
     color: 0x00ff00,
+    map: texture,
   });
 
   // Create body parts with proper spacing
   for (let i = 0; i <= snakeLength; i++) {
-    const bodyGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+    const bodyGeometry = new THREE.BoxGeometry(
+      i === 0 ? boxSize : boxSize / 1.1,
+      i === 0 ? boxSize : boxSize / 1.1,
+      i === 0 ? boxSize : boxSize / 1.1
+    );
     const mesh = new THREE.Mesh(
       bodyGeometry,
       i === 0 ? headMaterial : bodyPartMaterial
     );
+    // mesh.castShadow = true
+    mesh.receiveShadow = true;
     // This position is getting fixed before the render
     mesh.position.set(x, HEIGHT, y);
     scene.add(mesh);
@@ -120,7 +131,10 @@ export const createSnake = (
       return head;
     },
     updateDirection: (rigthtLeft: "right" | "left") => {
-      const nextDirection = getNextDirectionByRightLeft(head.direction, rigthtLeft);
+      const nextDirection = getNextDirectionByRightLeft(
+        head.direction,
+        rigthtLeft
+      );
 
       const nextStackPos = getNextDirectionFIFOStackPosition(
         head.mesh.position.x,
@@ -154,7 +168,6 @@ export const createSnake = (
         }
       });
       updateHeadStack(bodyParts[bodyParts.length - 1].nextDirectionFIFOStack);
-
     },
   };
 };

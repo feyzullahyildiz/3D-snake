@@ -1,12 +1,13 @@
 import * as THREE from "three";
 import { createOrbits } from "./create-orbits";
-import type { SnakeBodyPart } from "../helper/types";
+import type { GameOption, SnakeBodyPart } from "../helper/types";
 
 export const createOrbitCamera = (
   scene: THREE.Scene,
-  renderer: THREE.WebGLRenderer
+  renderer: THREE.WebGLRenderer,
+  gameOption: GameOption
 ) => {
-  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 20);
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
 
   camera.position.x = 0;
   camera.position.y = 14;
@@ -19,10 +20,13 @@ export const createOrbitCamera = (
   return {
     orbitCamera: camera,
     updateOrbitCamera: (_time: number, _speed: number, head: SnakeBodyPart) => {
-      camera.position.x = head.mesh.position.x;
-      camera.position.z = head.mesh.position.z;
+      if (gameOption.orbit_follow_snake) {
+        camera.position.x = head.mesh.position.x;
+        camera.position.z = head.mesh.position.z;
+        // camera.position.y = 10;
+      }
       renderer.setClearColor(0x000000, 1);
-      const size = 300;
+      const size = 500;
       renderer.setScissor(window.innerWidth - size, 10, size - 10, size);
       renderer.setViewport(window.innerWidth - size, 10, size - 10, size);
 

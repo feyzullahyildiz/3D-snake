@@ -1,22 +1,51 @@
 import * as THREE from "three";
+import type { SnakeBodyPart } from "../helper/types";
 
 export const createLights = (scene: THREE.Scene) => {
-  const ambient = new THREE.AmbientLight(0xffffff, 2);
+  // Ortam ışığını güçlü tutalım ama yıkıcı olmasın
+  const ambient = new THREE.AmbientLight(0x00FF00, 2);
   scene.add(ambient);
 
-  // DirectionalLight – sert, yönlü ışık (gölge için)
-  const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-  dirLight.position.set(5, 10, 7);
+  // Ana sert ışık — elmas yüzeyleri parlatır
+  const dirLight = new THREE.DirectionalLight(0xffffff, 5);
+  dirLight.position.set(0, 20, 0);
+
+  dirLight.shadow.mapSize.set(1024, 1024);
+  // dirLight.castShadow = true;
   scene.add(dirLight);
 
-  const dirLight2 = new THREE.DirectionalLight(0xffffff, 2.5);
-  dirLight2.position.set(5, 10, -7);
-  scene.add(dirLight2);
+  // const dirLightHelper = new THREE.DirectionalLightHelper(dirLight);
+  // scene.add(dirLightHelper);
 
-//   const spotLight = new THREE.SpotLight(0xffffff);
-//   spotLight.position.set(10, 10, 10);
-//   scene.add(spotLight);
+  // Karşıdan soğuk dolgu ışığı — mavi parıltı verir
+  // const fillLight = new THREE.DirectionalLight(0x99ccff, 2.0);
+  // fillLight.position.set(-5, 5, -5);
+  // scene.add(fillLight);
 
-//   const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-//   scene.add(spotLightHelper);
+  // Hafif renkli vurgular – elmasın içindeki ışık kırılmalarını taklit eder
+  // const warmLight = new THREE.PointLight(0xffffff, 8, 15);
+  // warmLight.position.set(3, 3, 4);
+  // warmLight.castShadow = true;
+  // // warmLight.shadow.mapSize.set(1024, 1024);
+  // scene.add(warmLight);
+
+  // const warmLightHelper = new THREE.PointLightHelper(warmLight);
+  // scene.add(warmLightHelper);
+
+  // const coolLight = new THREE.PointLight(0x88bbff, 1.5, 20);
+  // coolLight.position.set(-2, 3, -3);
+  // scene.add(coolLight);
+
+  return {
+    updateDirectionalLight: (
+      time: number,
+      speed: number,
+      head: SnakeBodyPart
+    ) => {
+      // dirLight.lookAt(head.mesh.position);
+      // warmLight.position.x = head.mesh.position.x-1;
+      // warmLight.position.z = head.mesh.position.z ;
+      // warmLight.position.y = 3;
+    },
+  };
 };

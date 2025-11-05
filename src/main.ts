@@ -10,6 +10,10 @@ import { createListenKeyboardForDirections } from "./lib/listen-keyboard-for-dir
 import { createUI } from "./lib/create-ui";
 import { createSnakeCamera } from "./lib/create-snake-camera";
 import { createOrbitCamera } from "./lib/create-orbit-camera";
+import { createGameOption } from "./helper/create-game-option";
+
+
+const GAME_OPTION = createGameOption();
 
 const BOX_SIZE = 0.85;
 
@@ -22,14 +26,15 @@ renderer.setScissorTest(true);
 
 document.getElementById("app")!.appendChild(renderer.domElement);
 
-const GROUND_SIZE = 9;
+const GROUND_SIZE = 5;
 const helper = new THREE.GridHelper(GROUND_SIZE + 1, GROUND_SIZE + 1);
 scene.add(helper);
 
-const {updateGround } = createGround(scene, GROUND_SIZE, BOX_SIZE);
-createLights(scene);
-const { updateHeadPosition, updateHeadStack } = createUI(scene);
-const { updateFood, updateFoodPosition } = createFood(scene, 2, 2);
+const {updateDirectionalLight} = createLights(scene);
+
+const { updateGround } = createGround(scene, GROUND_SIZE, BOX_SIZE);
+const { updateHeadPosition, updateHeadStack, updateSpeed } = createUI(scene);
+const { updateFood, setFoodPosition } = createFood(scene, 2, 2, GROUND_SIZE);
 const { updateSnake, updateDirection } = createSnake(
   scene,
   0,
@@ -38,25 +43,31 @@ const { updateSnake, updateDirection } = createSnake(
   updateHeadPosition,
   updateHeadStack
 );
-createListenKeyboardForDirections(updateDirection);
+createListenKeyboardForDirections(updateDirection, GAME_OPTION);
 
 const { updateSnakeCamera } = createSnakeCamera(scene, renderer);
-const { updateOrbitCamera } = createOrbitCamera(scene, renderer);
+const { updateOrbitCamera } = createOrbitCamera(scene, renderer, GAME_OPTION);
 
-let lastTick = Date.now();
+const SPEED_FACTOR = 4;
+// const SPEED_FACTOR = .4;
+const clock = new THREE.Clock(); 
 function animate() {
-  const delta = Date.now() - lastTick;
-  const speed = delta * 0.004;
-  // console.log(speed)
+  const delta = clock.getDelta();
 
-  updateFood(lastTick);
-  const head = updateSnake(lastTick, speed);
+  const speed = delta * SPEED_FACTOR; // delta saniye, hız faktörü örn. 4 birim/saniye
 
-  updateSnakeCamera(lastTick, speed, head);
-  updateOrbitCamera(lastTick, speed, head);
-  updateGround(lastTick, speed, head);
+  updateSpeed(speed);
 
-  lastTick = Date.now();
+  const head = updateSnake(clock.elapsedTime, speed);
+  
+  updateFood(clock.elapsedTime, speed, head);
+  updateSnakeCamera(clock.elapsedTime, speed, head);
+  updateOrbitCamera(clock.elapsedTime, speed, head);
+  updateGround(clock.elapsedTime, speed, head);
+  updateDirectionalLight(clock.elapsedTime, speed, head);
 }
 
 renderer.setAnimationLoop(animate);
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;

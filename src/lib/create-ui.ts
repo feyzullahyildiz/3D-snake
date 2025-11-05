@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { SnakeFIFOItem } from "../helper/types";
+import { throttle } from "../helper/throttle";
 
 export const createUI = (_scene: THREE.Scene) => {
   const parent = document.createElement("div");
@@ -11,21 +12,31 @@ export const createUI = (_scene: THREE.Scene) => {
   parent.style.whiteSpace = "pre";
   parent.style.fontFamily = "monospace";
   parent.style.fontSize = "24px";
+  parent.style.display = "flex";
+  parent.style.flexDirection = "column";
+  parent.style.alignItems = "flex-end";
+  parent.style.gap = "8px";
 
   document.body.appendChild(parent);
 
-  const headPosition = document.createElement("div");
+  const speedDiv = document.createElement("div");
+  const headPositionDiv = document.createElement("div");
+
   const headStackTable = document.createElement("table");
   const headStack = document.createElement("tbody");
   headStackTable.append(headStack);
 
-  parent.appendChild(headPosition);
+  parent.appendChild(speedDiv);
+  parent.appendChild(headPositionDiv);
   parent.appendChild(headStack);
 
   return {
-    updateHeadPosition: (x: number, y: number, z: number) => {
-      headPosition.innerHTML = `X: ${x.toFixed(2)}\nZ: ${z.toFixed(2)}`;
+    updateHeadPosition: (x: number, _y: number, z: number) => {
+      headPositionDiv.innerHTML = `X: ${x.toFixed(2)}\nZ: ${z.toFixed(2)}`;
     },
+    updateSpeed: throttle(80, (speed: number) => {
+      speedDiv.innerHTML = `Speed: ${speed.toFixed(5)}`;
+    }),
     updateHeadStack: (stack: Array<SnakeFIFOItem>) => {
       //   headStack.childNodes.forEach((item) => item.remove());
       headStack.innerHTML = "";

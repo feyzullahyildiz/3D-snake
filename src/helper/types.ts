@@ -15,3 +15,8 @@ export type SnakeBodyPart = {
   direction: SnakeDirection;
   nextDirectionFIFOStack: Array<SnakeFIFOItem>;
 };
+
+
+export type GameOption = {
+  orbit_follow_snake: boolean;
+}

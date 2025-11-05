@@ -15,7 +15,7 @@ export const createSnakeCamera = (
     // const camHelper = new THREE.CameraHelper(cam);
     // scene.add(camHelper);
 
-  cam.position.set(0, 10, 10);
+  cam.position.set(-3.5, 10, 0);
   cam.lookAt(0, 0, 0);
   scene.add(cam);
 
@@ -24,7 +24,7 @@ export const createSnakeCamera = (
 
   return {
     updateSnakeCamera: (_time: number, _speed: number, head: SnakeBodyPart) => {
-      cam.position.y = 5;
+      cam.position.y = 4;
       const { x, z } = head.mesh.position;
       setCamTargetPosition(targetPosition, x, z, head.direction);
 
@@ -38,6 +38,7 @@ export const createSnakeCamera = (
 
       renderer.render(scene, cam);
     },
+    setCameraY: () => {}
   };
 };
 
