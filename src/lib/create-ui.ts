@@ -21,6 +21,7 @@ export const createUI = (_scene: THREE.Scene) => {
 
   const speedDiv = document.createElement("div");
   const headPositionDiv = document.createElement("div");
+  const headRelativePositionDiv = document.createElement("div");
 
   const headStackTable = document.createElement("table");
   const headStack = document.createElement("tbody");
@@ -28,11 +29,15 @@ export const createUI = (_scene: THREE.Scene) => {
 
   parent.appendChild(speedDiv);
   parent.appendChild(headPositionDiv);
+  parent.appendChild(headRelativePositionDiv);
   parent.appendChild(headStack);
 
   return {
     updateHeadPosition: (x: number, _y: number, z: number) => {
       headPositionDiv.innerHTML = `X: ${x.toFixed(2)}\nZ: ${z.toFixed(2)}`;
+    },
+    updateRelativeHeadPosition: (x: number, _y: number, z: number) => {
+      headRelativePositionDiv.innerHTML = `relative X: ${x.toFixed(2)}\nrelative Z: ${z.toFixed(2)}`;
     },
     updateSpeed: throttle(80, (speed: number) => {
       speedDiv.innerHTML = `Speed: ${speed.toFixed(5)}`;

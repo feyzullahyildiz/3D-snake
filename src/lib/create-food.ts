@@ -10,10 +10,12 @@ const FOOD_NAME = "food";
 export const createFood = (
   scene: THREE.Scene,
   x: number,
+  y: number,
   z: number,
   groundSize: number
 ) => {
-  const { groups, center } = create9TileGroups(groundSize, (i) => {
+  const foodPosition = new THREE.Vector3(x, 1, z)
+  const { groups, center } = create9TileGroups(groundSize, () => {
     const geometry = new THREE.CapsuleGeometry(0.2, 0.1, 0.1, 8);
 
     const material = new THREE.MeshPhysicalMaterial({
@@ -60,28 +62,47 @@ export const createFood = (
         ) as THREE.Group;
         food.position.y = Math.sin(time * 3) / 10;
         food.rotation.y += speed / 3;
-        lightGroup.position.y = 0.2+food.position.y;
-        lightGroup.rotation.y = food.rotation.y;
+        lightGroup.position.y = food.position.y + 0.1;
+        // lightGroup.rotation.y = food.rotation.y;
       }
       update9TileGroupPosition(groundSize, center, groups, head.mesh.position);
     },
-    setFoodPosition: (newX: number, newY: number) => {
+    setFoodPosition: (newX: number, newZ: number) => {
+      // foodPosition.set()
       // food.position.set(newX, 1.5, newY);
+      for (const g of groups) {
+        const group = g as THREE.Group;
+        const food = group.getObjectByName(FOOD_NAME) as THREE.Mesh;
+        const lightGroup = group.getObjectByName(
+          LIGHT_GROUP_NAME
+        ) as THREE.Group;
+
+        food.position.x = newX;
+        food.position.z = newZ;
+        lightGroup.position.set(
+          food.position.x,
+          food.position.y,
+          food.position.z
+        );
+      }
     },
   };
 };
 
 function createLightGroup(scene: THREE.Scene) {
-  const l1 = new THREE.PointLight(0xffffff, 20, 2);
+  const intensity = 10;
+  const distance = 10;
+  const decay = 1;
+  const l1 = new THREE.PointLight(0xffffff, intensity, distance, decay);
   l1.position.set(0, 0, 1);
 
-  const l2 = new THREE.PointLight(0xffffff, 20, 2);
+  const l2 = new THREE.PointLight(0xffffff, intensity, distance, decay);
   l2.position.set(0, 0, -1);
 
-  const l3 = new THREE.PointLight(0xffffff, 20, 2);
+  const l3 = new THREE.PointLight(0xffffff, intensity, distance, decay);
   l3.position.set(1, 0, 0);
 
-  const l4 = new THREE.PointLight(0xffffff, 20, 2);
+  const l4 = new THREE.PointLight(0xffffff, intensity, distance, decay);
   l4.position.set(-1, 0, 0);
 
   const group = new THREE.Group();

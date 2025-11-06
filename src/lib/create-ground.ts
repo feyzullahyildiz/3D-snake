@@ -16,9 +16,14 @@ export const createGround = (scene: THREE.Scene, size = 5, boxSize = 0.85) => {
   }
   const texture = new THREE.TextureLoader().load("cube_texture.png");
   texture.colorSpace = THREE.SRGBColorSpace;
-
-  const { groups, center } = create9TileGroups(size, (i) =>
-    getTileArray(size, boxSize, i, texture)
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(size, size); // 5x5 tekrar etsin örneğin
+  const { groups, center } = create9TileGroups(
+    size,
+    (i) => getTile(size, boxSize, i, texture)
+    // (i) => getTileArray(size, boxSize, i, texture)
+    // getTileArray(size, boxSize, i, texture)
   );
   scene.add(...groups);
 
@@ -29,6 +34,26 @@ export const createGround = (scene: THREE.Scene, size = 5, boxSize = 0.85) => {
   };
 };
 
+function getTile(
+  size: number,
+  boxSize: number,
+  colorIndex: number,
+  texture: THREE.Texture
+) {
+  const geometry = new THREE.BoxGeometry(size, 1, size);
+
+  const t = (1 + size) / (size * 3) + colorIndex;
+  const hue = 0.62 + 0.1 * t; // HSL hue aralığı: 0.65 (lacivert) → 0.75 (mor)
+  const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
+  const material = new THREE.MeshPhongMaterial({
+    color: color,
+    shininess: 100,
+    map: texture,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+
+  return mesh;
+}
 function getTileArray(
   size: number,
   boxSize: number,

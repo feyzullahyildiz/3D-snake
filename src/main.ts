@@ -11,8 +11,9 @@ import { createUI } from "./lib/create-ui";
 import { createSnakeCamera } from "./lib/create-snake-camera";
 import { createOrbitCamera } from "./lib/create-orbit-camera";
 import { createGameOption } from "./helper/create-game-option";
+import { createRelativePosition } from "./lib/create-relative-position";
 
-
+const PLAYGROUND_Y_LEVEL = 1.25;
 const GAME_OPTION = createGameOption();
 
 const BOX_SIZE = 0.85;
@@ -26,15 +27,26 @@ renderer.setScissorTest(true);
 
 document.getElementById("app")!.appendChild(renderer.domElement);
 
-const GROUND_SIZE = 5;
+const GROUND_SIZE = 7;
 const helper = new THREE.GridHelper(GROUND_SIZE + 1, GROUND_SIZE + 1);
 scene.add(helper);
 
-const {updateDirectionalLight} = createLights(scene);
+const { updateDirectionalLight } = createLights(scene);
 
 const { updateGround } = createGround(scene, GROUND_SIZE, BOX_SIZE);
-const { updateHeadPosition, updateHeadStack, updateSpeed } = createUI(scene);
-const { updateFood, setFoodPosition } = createFood(scene, 2, 2, GROUND_SIZE);
+const {
+  updateHeadPosition,
+  updateRelativeHeadPosition,
+  updateHeadStack,
+  updateSpeed,
+} = createUI(scene);
+const { updateFood, setFoodPosition } = createFood(
+  scene,
+  2,
+  PLAYGROUND_Y_LEVEL,
+  2,
+  GROUND_SIZE
+);
 const { updateSnake, updateDirection } = createSnake(
   scene,
   0,
@@ -48,9 +60,11 @@ createListenKeyboardForDirections(updateDirection, GAME_OPTION);
 const { updateSnakeCamera } = createSnakeCamera(scene, renderer);
 const { updateOrbitCamera } = createOrbitCamera(scene, renderer, GAME_OPTION);
 
-const SPEED_FACTOR = 4;
+const { getRelativePosition } = createRelativePosition(GROUND_SIZE);
+
+const SPEED_FACTOR = 1;
 // const SPEED_FACTOR = .4;
-const clock = new THREE.Clock(); 
+const clock = new THREE.Clock();
 function animate() {
   const delta = clock.getDelta();
 
@@ -59,7 +73,10 @@ function animate() {
   updateSpeed(speed);
 
   const head = updateSnake(clock.elapsedTime, speed);
-  
+  const relativeHead = getRelativePosition(head.mesh.position);
+
+  updateRelativeHeadPosition(relativeHead.x, relativeHead.y, relativeHead.z);
+
   updateFood(clock.elapsedTime, speed, head);
   updateSnakeCamera(clock.elapsedTime, speed, head);
   updateOrbitCamera(clock.elapsedTime, speed, head);
