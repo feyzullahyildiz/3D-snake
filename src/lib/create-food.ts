@@ -86,7 +86,7 @@ export const createFood = (
   };
 };
 
-function createLightGroup(scene: THREE.Scene) {
+function createLightGroup(_scene: THREE.Scene) {
   const intensity = 10;
   const distance = 10;
   const decay = 1;
@@ -109,10 +109,10 @@ function createLightGroup(scene: THREE.Scene) {
   group.add(l3);
   group.add(l4);
 
-  const l1Helper = new THREE.PointLightHelper(l1);
-  const l2Helper = new THREE.PointLightHelper(l2);
-  const l3Helper = new THREE.PointLightHelper(l3);
-  const l4Helper = new THREE.PointLightHelper(l4);
+  // const l1Helper = new THREE.PointLightHelper(l1);
+  // const l2Helper = new THREE.PointLightHelper(l2);
+  // const l3Helper = new THREE.PointLightHelper(l3);
+  // const l4Helper = new THREE.PointLightHelper(l4);
   // scene.add(l1Helper);
   // scene.add(l2Helper);
   // scene.add(l3Helper);

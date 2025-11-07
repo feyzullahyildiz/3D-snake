@@ -36,7 +36,7 @@ export const createGround = (scene: THREE.Scene, size = 5, boxSize = 0.85) => {
 
 function getTile(
   size: number,
-  boxSize: number,
+  _boxSize: number,
   colorIndex: number,
   texture: THREE.Texture
 ) {
@@ -54,33 +54,3 @@ function getTile(
 
   return mesh;
 }
-function getTileArray(
-  size: number,
-  boxSize: number,
-  colorIndex: number,
-  texture: THREE.Texture
-) {
-  const start = -Math.trunc(size / 2);
-  const end = Math.abs(start);
-  const arr = [];
-  for (let i = start; i <= end; i++) {
-    for (let j = start; j <= end; j++) {
-      // 💜 Lacivert - mor arası yumuşak gradient
-      const t = (i + size) / (size * 3) + colorIndex;
-      const hue = 0.62 + 0.1 * t; // HSL hue aralığı: 0.65 (lacivert) → 0.75 (mor)
-      const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
-      const geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-      const material = new THREE.MeshPhongMaterial({
-        color: color,
-        shininess: 100,
-        map: texture,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(i, 0.5, j);
-      arr.push(mesh);
-    }
-  }
-  return arr;
-}
-
-// createOther8TileArrays fonksiyonuna gerek yok, çünkü tüm 9 tile set aynı şekilde oluşturuluyor.

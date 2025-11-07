@@ -38,9 +38,9 @@ export const createLights = (scene: THREE.Scene) => {
 
   return {
     updateDirectionalLight: (
-      time: number,
-      speed: number,
-      head: SnakeBodyPart
+      _time: number,
+      _speed: number,
+      _head: SnakeBodyPart
     ) => {
       // dirLight.lookAt(head.mesh.position);
       // warmLight.position.x = head.mesh.position.x-1;
