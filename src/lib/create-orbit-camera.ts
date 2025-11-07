@@ -26,7 +26,7 @@ export const createOrbitCamera = (
         // camera.position.y = 10;
       }
       renderer.setClearColor(0x000000, 1);
-      const size = 500;
+      const size = 200;
       renderer.setScissor(window.innerWidth - size, 10, size - 10, size);
       renderer.setViewport(window.innerWidth - size, 10, size - 10, size);
 

@@ -14,7 +14,7 @@ export const createFood = (
   z: number,
   groundSize: number
 ) => {
-  const foodPosition = new THREE.Vector3(x, 1, z)
+  const foodPosition = new THREE.Vector3(x, y, z)
   const { groups, center } = create9TileGroups(groundSize, () => {
     const geometry = new THREE.CapsuleGeometry(0.2, 0.1, 0.1, 8);
 
@@ -31,24 +31,18 @@ export const createFood = (
     const food = new THREE.Mesh(geometry, material);
     food.name = FOOD_NAME;
     food.castShadow = true;
-    // food.receiveShadow = true
-    // food.position.set(x, 1.1, z);
-    // food.position.set(0, 0, 0);
-    // const light = new THREE.PointLight(0xffffff, 10, 2);
-    // light.name = "light";
-
-    // light.position.set(0, 0, 1);
-
-    // const lightHelper = new THREE.PointLightHelper(light);
+    
     const group = new THREE.Group();
     const lightGroup = createLightGroup(scene);
-    group.position.set(x, 1.5, z);
+    group.position.set(x, y, z);
 
     group.add(food);
     group.add(lightGroup);
 
     return group;
   });
+
+  console.log("center", center)
 
   scene.add(...groups);
 
@@ -68,7 +62,7 @@ export const createFood = (
       update9TileGroupPosition(groundSize, center, groups, head.mesh.position);
     },
     setFoodPosition: (newX: number, newZ: number) => {
-      // foodPosition.set()
+      foodPosition.set(newX, foodPosition.y, newZ)
       // food.position.set(newX, 1.5, newY);
       for (const g of groups) {
         const group = g as THREE.Group;
@@ -86,6 +80,9 @@ export const createFood = (
         );
       }
     },
+    getRelativeFoodPosition: () => {
+      return foodPosition
+    }
   };
 };
 

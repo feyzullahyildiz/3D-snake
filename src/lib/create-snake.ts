@@ -9,12 +9,12 @@ import { getIsPositionPassed } from "../helper/get-is-position-passed";
 import { getNextDirectionFIFOStackByOldOne } from "../helper/get-next-direction-fifo-stack-by-old-one";
 import { getNextDirectionByRightLeft } from "../helper/get-next-direction-by-right-left";
 
-const HEIGHT = 1.38;
 
 export const createSnake = (
   scene: THREE.Scene,
   x: number,
   y: number,
+  z: number,
   boxSize: number,
   notifyHeadPosition: (x: number, y: number, z: number) => void,
   // updateDemoPosition: (x: number, z: number) => void,
@@ -54,7 +54,7 @@ export const createSnake = (
     // mesh.castShadow = true
     mesh.receiveShadow = true;
     // This position is getting fixed before the render
-    mesh.position.set(x, HEIGHT, y);
+    mesh.position.set(x, y, z);
     scene.add(mesh);
     bodyParts.push({
       mesh,

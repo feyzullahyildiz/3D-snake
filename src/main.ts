@@ -12,6 +12,8 @@ import { createSnakeCamera } from "./lib/create-snake-camera";
 import { createOrbitCamera } from "./lib/create-orbit-camera";
 import { createGameOption } from "./helper/create-game-option";
 import { createRelativePosition } from "./lib/create-relative-position";
+import { createFoodCollisitionDedector } from "./lib/create-food-collision-detector";
+import { getRandomRelativePosition } from "./helper/get-random-relative-position";
 
 const PLAYGROUND_Y_LEVEL = 1.25;
 const GAME_OPTION = createGameOption();
@@ -27,7 +29,7 @@ renderer.setScissorTest(true);
 
 document.getElementById("app")!.appendChild(renderer.domElement);
 
-const GROUND_SIZE = 7;
+const GROUND_SIZE = 21;
 const helper = new THREE.GridHelper(GROUND_SIZE + 1, GROUND_SIZE + 1);
 scene.add(helper);
 
@@ -40,17 +42,18 @@ const {
   updateHeadStack,
   updateSpeed,
 } = createUI(scene);
-const { updateFood, setFoodPosition } = createFood(
+const { updateFood, setFoodPosition, getRelativeFoodPosition } = createFood(
   scene,
-  2,
+  0,
   PLAYGROUND_Y_LEVEL,
-  2,
+  0,
   GROUND_SIZE
 );
 const { updateSnake, updateDirection } = createSnake(
   scene,
-  0,
-  0,
+  1,
+  PLAYGROUND_Y_LEVEL,
+  1,
   BOX_SIZE / 1,
   updateHeadPosition,
   updateHeadStack
@@ -61,8 +64,8 @@ const { updateSnakeCamera } = createSnakeCamera(scene, renderer);
 const { updateOrbitCamera } = createOrbitCamera(scene, renderer, GAME_OPTION);
 
 const { getRelativePosition } = createRelativePosition(GROUND_SIZE);
-
-const SPEED_FACTOR = 1;
+const { getIsOnFood } = createFoodCollisitionDedector();
+const SPEED_FACTOR = 4;
 // const SPEED_FACTOR = .4;
 const clock = new THREE.Clock();
 function animate() {
@@ -82,6 +85,16 @@ function animate() {
   updateOrbitCamera(clock.elapsedTime, speed, head);
   updateGround(clock.elapsedTime, speed, head);
   updateDirectionalLight(clock.elapsedTime, speed, head);
+
+  const relativeFoodPosition = getRelativeFoodPosition();
+  // console.log(relativeFoodPosition)
+  const res = getIsOnFood(relativeHead, relativeFoodPosition);
+  if (res) {
+    // console.log(res);
+    const x = getRandomRelativePosition(GROUND_SIZE);
+    const z = getRandomRelativePosition(GROUND_SIZE);
+    setFoodPosition(x, z);
+  }
 }
 
 renderer.setAnimationLoop(animate);
